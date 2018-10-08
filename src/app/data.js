@@ -37,13 +37,13 @@ var onloadAboutMe = createLoader(function (callback) {
           return ''
         }
       } else {
-        window.FreeLogApp.handleErrorResponse(data)
+        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE',{response: data})
       }
     })
 });
 
 function loadPresentablesByTags(tags) {
-  return window.QI.fetch(`/v1/presentables?nodeId=${nodeId}&tags=${tags}`).then(res => res.json())
+  return window.FreelogApp.QI.fetch(`/v1/presentables?nodeId=${nodeId}&tags=${tags}`).then(res => res.json())
     .then(res => {
       if (res.errcode === 0) {
         return res.data
@@ -66,31 +66,31 @@ function loadBlogConfig() {
           return null
         }
       } else {
-        window.FreeLogApp.handleErrorResponse(data)
+        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE',{response: data})
       }
     })
 }
 
 
 var onloadArticles = createLoader(function (callback) {
-  window.QI.fetch(`/v1/presentables?nodeId=${nodeId}&tags=article&resourceType=markdown`)
+  window.FreelogApp.QI.fetch(`/v1/presentables?nodeId=${nodeId}&tags=article&resourceType=markdown`)
     .then(res => res.json())
     .then(res => {
       if (res.errcode === 0) {
         callback(res.data)
       } else {
-        window.FreeLogApp.handleErrorResponse(res)
+        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE',{response: res})
       }
     })
 });
 
 function loadPresentableInfo(presentableId) {
-  return window.QI.fetch(`/v1/presentables/${presentableId}`).then(res => res.json())
+  return window.FreelogApp.QI.fetch(`/v1/presentables/${presentableId}`).then(res => res.json())
 }
 
 function requestPresentableData(presentableId) {
   var nodeId = window.__auth_info__.__auth_node_id__
-  return window.QI.fetch(`/v1/auths/presentable/${presentableId}?nodeId=${nodeId}`)
+  return window.FreelogApp.QI.fetch(`/v1/auths/presentable/${presentableId}?nodeId=${nodeId}`)
     .then(res => {
       var meta = decodeURIComponent(res.headers.get('freelog-meta'))
       var token = decodeURIComponent(res.headers.get('freelog-sub-resource-auth-token'))

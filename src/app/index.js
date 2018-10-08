@@ -10,7 +10,6 @@ class FreelogAlphaBlog extends HTMLElement {
     super()
   }
 
-
   initApp() {
     var app = new Vue({
       el: '#freelog-alpha-blog-app',

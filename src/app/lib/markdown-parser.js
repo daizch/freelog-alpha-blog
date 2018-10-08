@@ -5379,7 +5379,7 @@ hljs.registerLanguage('csp', function(hljs) {
     keywords: {
       keyword: 'base-uri child-src connect-src default-src font-src form-action' +
         ' frame-ancestors frame-src img-src media-src object-src plugin-types' +
-        ' report-uri sandbox script-src style-src', 
+        ' report-uri sandbox script-src style-src',
     },
     contains: [
     {
@@ -7052,7 +7052,7 @@ hljs.registerLanguage('excel', function(hljs) {
     },
     contains: [
       {
-        /* matches a beginning equal sign found in Excel formula examples */ 
+        /* matches a beginning equal sign found in Excel formula examples */
         begin: /^=/,
         end: /[^=]/, returnEnd: true, illegal: /=/, /* only allow single equal sign at front of line */
         relevance: 10
@@ -13004,7 +13004,7 @@ hljs.registerLanguage('powershell', function(hljs) {
   var PS_HELPTAGS = {
     className: 'doctag',
     variants: [
-      /* no paramater help tags */ 
+      /* no paramater help tags */
       { begin: /\.(synopsis|description|example|inputs|outputs|notes|link|component|role|functionality)/ },
       /* one parameter help tags */
       { begin: /\.(parameter|forwardhelptargetname|forwardhelpcategory|remotehelprunspace|externalhelp)\s+\S+/ }
@@ -17675,9 +17675,9 @@ var MarkdownParser = function () {
         $img.src = resourceId;
       });
 
-      return window.QI.fetchResource(resourceId).then(function (res) {
+      return window.FreelogApp.QI.fetchPresentableResourceInfo(resourceId).then(function (res) {
         //fetch image fail
-        if (!res.headers.get('freelog-contract-id')) {
+        if (!res.headers.get('freelog-resource-type')) {
           return res.json().then(function (data) {
             done(function ($img) {
               if (self._opts.renderImageError) {

@@ -62,17 +62,19 @@
         }
 
         if (this.data.error) {
-          this.data.errorInfo = window.FreeLogApp.getErrorInfo(this.data.error);
+          this.data.errorInfo = window.FreelogApp.getErrorInfo(this.data.error);
         } else {
           this.parser.render(this.data.content);
         }
         this.loading = false
       },
       errorHandler(data) {
+        var presentable = data.error.data.data
         var contract = data.error.data.data.contract;
         var contractState = contract && contract.status
-        window.FreeLogApp.handleErrorResponse(data.error, (presentable) => {
-          if (presentable._contractStatus !== contractState) {
+        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE', {
+          response: data.error,
+          callback: () => {
             this.$emit('reload', presentable)
           }
         })
