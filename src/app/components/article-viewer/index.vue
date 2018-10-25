@@ -57,6 +57,8 @@
     },
     methods: {
       render() {
+        this.loading = false
+
         if (!this.data || (!this.data.error && !this.data.content)) {
           return;
         }
@@ -66,7 +68,6 @@
         } else {
           this.parser.render(this.data.content);
         }
-        this.loading = false
       },
       errorHandler(data) {
         var presentable = data.error.data.data

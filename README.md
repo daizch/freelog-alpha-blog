@@ -30,7 +30,7 @@ package.json中freelogConfig字段可配置freelog资源相关的配置数据。
 
 ```json
 {
-  "name": "博客页面标题",
+  "blogTitle": "博客页面标题",
   "avatar": "博主头像资源ID",
   "postImage": "博客导航封面图资源ID",
   "blogDesc": "博客介绍"

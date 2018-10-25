@@ -54,17 +54,22 @@
     methods: {
       initView() {
         loadBlogConfig().then(data => {
+
           if (data && data.token) {
-            var blogConfig;
+            var blogConfig = data;
             try {
-              blogConfig = JSON.parse(data.content)
-              blogConfig.avatarUrl = `/api/v1/auths/presentable/subResource/${blogConfig.avatar}?token=${data.token}`;
-              blogConfig.postImageUrl = `/api/v1/auths/presentable/subResource/${blogConfig.postImage}?token=${data.token}`;
-              this.setPageTitle(blogConfig.name)
+              window.FreelogApp.QI.resolveResourceUrl({resourceId: blogConfig.avatar}).then(url => {
+                blogConfig.avatarUrl = url
+              })
+
+              window.FreelogApp.QI.resolveResourceUrl({resourceId: blogConfig.postImage}).then(url => {
+                blogConfig.postImageUrl = url
+              })
+              this.setPageTitle(blogConfig.blogTitle || blogConfig.name)
             } catch (e) {
+              console.error(e)
               blogConfig = {}
             }
-
             this.blogConfig = blogConfig
           }
         })
@@ -73,7 +78,7 @@
         ev.target.classList.add('show')
       },
       setPageTitle(title) {
-        // document.title = title
+        document.title = title
       }
     },
 

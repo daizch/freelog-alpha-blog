@@ -22,8 +22,6 @@ function createLoader(loader) {
   }
 }
 
-var nodeId = window.__auth_info__.__auth_node_id__
-
 var onloadAboutMe = createLoader(function (callback) {
   loadPresentablesByTags('aboutme')
     .then(data => {
@@ -37,20 +35,21 @@ var onloadAboutMe = createLoader(function (callback) {
           return ''
         }
       } else {
-        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE',{response: data})
+        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE', {response: data})
       }
     })
 });
 
 function loadPresentablesByTags(tags) {
-  return window.FreelogApp.QI.fetch(`/v1/presentables?nodeId=${nodeId}&tags=${tags}`).then(res => res.json())
-    .then(res => {
-      if (res.errcode === 0) {
-        return res.data
-      } else {
-        return res
-      }
-    })
+  return window.FreelogApp.QI.fetchPresentablesList({
+    tags
+  }).then(res => {
+    if (res.errcode === 0) {
+      return res.data
+    } else {
+      return res
+    }
+  })
 }
 
 function loadBlogConfig() {
@@ -59,38 +58,41 @@ function loadBlogConfig() {
       if (data.errcode === undefined) {
         var presentable = data[0]
         if (presentable) {
-          return requestPresentableData(presentable.presentableId).then(data => {
-            return Object.assign(presentable, data)
+          return window.FreelogApp.QI.fetchPresentableResourceData(presentable.presentableId).then(res => {
+            presentable.token = decodeURIComponent(res.headers.get('freelog-sub-resource-auth-token'))
+            return res.json().then(data => {
+              return Object.assign(presentable, data)
+            })
           })
         } else {
           return null
         }
       } else {
-        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE',{response: data})
+        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE', {response: data})
       }
     })
 }
 
 
 var onloadArticles = createLoader(function (callback) {
-  window.FreelogApp.QI.fetch(`/v1/presentables?nodeId=${nodeId}&tags=article&resourceType=markdown`)
-    .then(res => res.json())
-    .then(res => {
-      if (res.errcode === 0) {
-        callback(res.data)
-      } else {
-        window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE',{response: res})
-      }
-    })
+  return window.FreelogApp.QI.fetchPresentablesList({
+    tags: 'article',
+    resourceType: 'markdown'
+  }).then(res => {
+    if (res.errcode === 0) {
+      callback(res.data)
+    } else {
+      window.FreelogApp.trigger('HANDLE_INVALID_RESPONSE', {response: res})
+    }
+  })
 });
 
 function loadPresentableInfo(presentableId) {
-  return window.FreelogApp.QI.fetch(`/v1/presentables/${presentableId}`).then(res => res.json())
+  return window.FreelogApp.QI.fetchPresentableResourceInfo(presentableId)
 }
 
 function requestPresentableData(presentableId) {
-  var nodeId = window.__auth_info__.__auth_node_id__
-  return window.FreelogApp.QI.fetch(`/v1/auths/presentable/${presentableId}?nodeId=${nodeId}`)
+  return window.FreelogApp.QI.fetchPresentableResourceData(presentableId)
     .then(res => {
       var meta = decodeURIComponent(res.headers.get('freelog-meta'))
       var token = decodeURIComponent(res.headers.get('freelog-sub-resource-auth-token'))
@@ -105,12 +107,12 @@ function requestPresentableData(presentableId) {
       if (!article) {
         return res.json().then(errResponse => {
           return loadPresentableInfo(presentableId)
-            .then(res => {
-              article = res.data.resourceInfo.meta || {}
+            .then(data => {
+              article = data.resourceInfo.meta || {}
               article.presentableId = presentableId
               article.error = errResponse
               article.token = token
-              return Object.assign(article, res.data);
+              return Object.assign(article, data);
             })
         })
       } else {
